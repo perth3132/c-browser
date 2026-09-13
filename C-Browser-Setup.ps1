@@ -52,7 +52,10 @@ function Install-Browser {
     $runtimeExtract = Join-Path $tempRoot 'runtime'
     try {
         New-Item -ItemType Directory -Force -Path $InstallRoot,$tempRoot | Out-Null
-        Copy-Item $PSCommandPath (Join-Path $InstallRoot 'C-Browser-Setup.ps1') -Force
+        $installedSetup = Join-Path $InstallRoot 'C-Browser-Setup.ps1'
+        if ([IO.Path]::GetFullPath($PSCommandPath) -ne [IO.Path]::GetFullPath($installedSetup)) {
+            Copy-Item $PSCommandPath $installedSetup -Force
+        }
         Invoke-WebRequest "$Repo/browser.exe" -OutFile (Join-Path $InstallRoot 'browser.exe')
         Invoke-WebRequest "$Repo/WebView2Loader.dll" -OutFile (Join-Path $InstallRoot 'WebView2Loader.dll')
         Invoke-WebRequest $RuntimeUrl -OutFile $runtimeArchive
@@ -69,14 +72,13 @@ function Install-Browser {
         New-Shortcut $DesktopShortcut
         New-Shortcut (Join-Path $StartMenuFolder 'C Browser.lnk')
         New-Item -Path $UninstallKey -Force | Out-Null
-        New-ItemProperty $UninstallKey DisplayName $AppName -PropertyType String -Force | Out-Null
-        New-ItemProperty $UninstallKey DisplayVersion $Version -PropertyType String -Force | Out-Null
-        New-ItemProperty $UninstallKey Publisher 'perth3132' -PropertyType String -Force | Out-Null
-        New-ItemProperty $UninstallKey InstallLocation $InstallRoot -PropertyType String -Force | Out-Null
-        New-ItemProperty $UninstallKey DisplayIcon (Join-Path $InstallRoot 'browser.exe') -PropertyType String -Force | Out-Null
-        $installedSetup = Join-Path $InstallRoot 'C-Browser-Setup.ps1'
+        New-ItemProperty -Path $UninstallKey -Name DisplayName -Value $AppName -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $UninstallKey -Name DisplayVersion -Value $Version -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $UninstallKey -Name Publisher -Value 'perth3132' -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $UninstallKey -Name InstallLocation -Value $InstallRoot -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $UninstallKey -Name DisplayIcon -Value (Join-Path $InstallRoot 'browser.exe') -PropertyType String -Force | Out-Null
         $uninstallCommand = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File `"$installedSetup`" -Uninstall"
-        New-ItemProperty $UninstallKey UninstallString $uninstallCommand -PropertyType String -Force | Out-Null
+        New-ItemProperty -Path $UninstallKey -Name UninstallString -Value $uninstallCommand -PropertyType String -Force | Out-Null
         Write-Host "$AppName installed to $InstallRoot"
         Write-Host 'A desktop and Start Menu shortcut were created.'
     } finally {
