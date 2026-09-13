@@ -27,6 +27,18 @@ After building, install the browser and fixed WebView2 runtime with:
 
 The installer downloads the pinned `WebView2.Runtime.X64` version `152.0.4191.62`, matched to the WebView2 loader used by this build, installs it beside the browser, and creates a desktop shortcut. The installer is per-user and writes to `%LOCALAPPDATA%\CWebBrowser`.
 
+It also creates a Start Menu shortcut and registers C Browser under Windows Apps and Features. To uninstall from PowerShell:
+
+```powershell
+.\uninstall.ps1
+```
+
+By default uninstallation removes the browser, fixed runtime, shortcuts, registry entry, and `%LOCALAPPDATA%\CWebBrowser\UserData`. Keep the user data with:
+
+```powershell
+.\uninstall.ps1 -KeepUserData
+```
+
 Then run:
 
 ```powershell
