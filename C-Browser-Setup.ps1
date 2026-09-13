@@ -2,6 +2,7 @@
 param(
     [switch]$Uninstall,
     [switch]$KeepUserData,
+    [switch]$Cleanup,
     [string]$InstallRoot = (Join-Path $env:LOCALAPPDATA 'CWebBrowser')
 )
 
@@ -15,6 +16,17 @@ $UninstallKey = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\CWebB
 $DesktopShortcut = Join-Path ([Environment]::GetFolderPath('Desktop')) 'C Browser.lnk'
 $StartMenuFolder = Join-Path ([Environment]::GetFolderPath('Programs')) 'C Browser'
 $UserData = Join-Path $env:LOCALAPPDATA 'CWebBrowser\UserData'
+
+if ($Uninstall -and -not $Cleanup) {
+    $temporaryUninstaller = Join-Path $env:TEMP "C-Browser-Uninstall-$([Guid]::NewGuid().ToString('N')).ps1"
+    Copy-Item $PSCommandPath $temporaryUninstaller -Force
+    $arguments = @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', $temporaryUninstaller,
+        '-Uninstall', '-Cleanup', '-InstallRoot', $InstallRoot)
+    if ($KeepUserData) { $arguments += '-KeepUserData' }
+    Start-Process -FilePath 'powershell.exe' -ArgumentList $arguments -WindowStyle Hidden
+    Write-Host "$AppName uninstall started."
+    exit 0
+}
 
 function Stop-InstalledBrowser {
     $browserPath = Join-Path $InstallRoot 'browser.exe'
@@ -33,9 +45,10 @@ function Remove-InstalledBrowser {
             Where-Object { $_.FullName -ne $UserData } |
             Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     } else {
-        $cleanupCommand = "timeout /t 2 /nobreak >nul & rmdir /s /q `"$InstallRoot`""
-        Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', $cleanupCommand -WindowStyle Hidden
+        Remove-Item $InstallRoot -Recurse -Force -ErrorAction SilentlyContinue
     }
+    $cleanupCommand = "timeout /t 2 /nobreak >nul & del /q `"$PSCommandPath`""
+    Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', $cleanupCommand -WindowStyle Hidden
     Write-Host "$AppName was uninstalled."
     if ($KeepUserData) { Write-Host "User data kept at $UserData" }
 }
