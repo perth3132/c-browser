@@ -28,10 +28,14 @@ function Remove-InstalledBrowser {
     Remove-Item $DesktopShortcut -Force -ErrorAction SilentlyContinue
     Remove-Item $StartMenuFolder -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item $UninstallKey -Recurse -Force -ErrorAction SilentlyContinue
-    if (-not $KeepUserData) {
-        Remove-Item $UserData -Recurse -Force -ErrorAction SilentlyContinue
+    if ($KeepUserData) {
+        Get-ChildItem $InstallRoot -Force -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -ne $UserData } |
+            Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
+    } else {
+        $cleanupCommand = "timeout /t 2 /nobreak >nul & rmdir /s /q `"$InstallRoot`""
+        Start-Process -FilePath 'cmd.exe' -ArgumentList '/c', $cleanupCommand -WindowStyle Hidden
     }
-    Remove-Item $InstallRoot -Recurse -Force -ErrorAction SilentlyContinue
     Write-Host "$AppName was uninstalled."
     if ($KeepUserData) { Write-Host "User data kept at $UserData" }
 }
