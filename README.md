@@ -25,6 +25,8 @@ For customers, share only [C-Browser-Setup.ps1](C-Browser-Setup.ps1). The direct
 
 It downloads the browser and fixed WebView2 runtime from this GitHub repository, installs per-user, and supports both installation and uninstallation:
 
+For a completely offline customer package, share [C-Browser-Offline-Installer.zip](C-Browser-Offline-Installer.zip). Extract that single ZIP and run `C-Browser-Offline-Setup.ps1`; it contains the browser and fixed WebView2 Runtime and does not download anything.
+
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\C-Browser-Setup.ps1
 powershell.exe -ExecutionPolicy Bypass -File .\C-Browser-Setup.ps1 -Uninstall
