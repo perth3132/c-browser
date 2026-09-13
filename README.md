@@ -19,7 +19,11 @@ Copy-Item vendor\webview2\build\native\x64\WebView2Loader.dll . -Force
 
 ## Install fixed runtime
 
-For customers, share only `C-Browser-Setup.ps1`. It downloads the browser and fixed WebView2 runtime from this GitHub repository, installs per-user, and supports both installation and uninstallation:
+For customers, share only [C-Browser-Setup.ps1](C-Browser-Setup.ps1). The direct download link is:
+
+`https://raw.githubusercontent.com/perth3132/c-browser/main/C-Browser-Setup.ps1`
+
+It downloads the browser and fixed WebView2 runtime from this GitHub repository, installs per-user, and supports both installation and uninstallation:
 
 ```powershell
 powershell.exe -ExecutionPolicy Bypass -File .\C-Browser-Setup.ps1
