@@ -1,0 +1,13 @@
+# Local WebView2 profiles and caches
+browser-data/
+browser.exe.WebView2/
+browser-data*
+
+# Downloaded package archives
+vendor/*.zip
+
+# Build and installer cache files
+runtime*.zip
+runtime-inspect/
+*.log
+*.apk
